@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OyenStore Premium Cinema | Hiburan Tanpa Had</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-orange: #f97316;
+            --primary-hover: #ea580c;
+            --dark-bg: #0b0c10;
+            --card-bg: rgba(22, 27, 34, 0.75);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --gold-star: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Ambient Glow Background */
+        .ambient-glow {
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 500px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.15) 0%, rgba(11, 12, 16, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Header & Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background: rgba(11, 12, 16, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--primary-orange);
+        }
+
+        .logo-badge {
+            background: var(--primary-orange);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .admin-trigger-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-trigger-btn:hover {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 50px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.12);
+            color: var(--primary-orange);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 40px;
+        }
+
+        /* Pricing Cards */
+        .pricing-section {
+            padding: 20px 8% 80px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px 30px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(249, 115, 22, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .pricing-card.popular {
+            background: linear-gradient(160deg, rgba(249, 115, 22, 0.1) 0%, rgba(22, 27, 34, 0.85) 100%);
+            border: 2px solid var(--primary-orange);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -14px;
+            right: 25px;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+
+        .card-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .card-price {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 42px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 25px;
+        }
+
+        .card-price span {
+            font-size: 16px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 35px;
+            flex-grow: 1;
+        }
+
+        .features-list li {
+            margin-bottom: 12px;
+            color: #d1d5db;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+        }
+
+        .features-list li::before {
+            content: '✓';
+            color: var(--primary-orange);
+            font-weight: bold;
+            margin-right: 12px;
+            background: rgba(249, 115, 22, 0.15);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .order-btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-card.popular .order-btn, .order-btn:hover {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+        }
+
+        .order-btn:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            padding: 60px 8% 100px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+        }
+
+        .feedback-form-container {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            margin: 0 auto 60px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(11, 12, 16, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--primary-orange);
+        }
+
+        .submit-fb-btn {
+            background: var(--primary-orange);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-fb-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .feedback-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stars {
+            color: var(--gold-star);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .feedback-text {
+            color: #d1d5db;
+            font-style: italic;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .customer-name {
+            font-weight: 700;
+            color: var(--primary-orange);
+            font-size: 14px;
+        }
+
+        /* Admin Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .admin-modal {
+            background: #12161f;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            padding: 35px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-orange);
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .login-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .admin-dashboard {
+            display: none;
+        }
+
+        .admin-dashboard.active {
+            display: block;
+        }
+
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-orange);
+            color: #fff;
+            border-color: var(--primary-orange);
+        }
+
+        .admin-tab-content {
+            display: none;
+        }
+
+        .admin-tab-content.active {
+            display: block;
+        }
+
+        .admin-fb-item {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            border-left: 4px solid var(--primary-orange);
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+            header {
+                padding: 15px 5%;
+            }
+            .pricing-section, .feedback-section {
+                padding-left: 5%;
+                padding-right: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="#" class="logo">
+            OYEN<span>STORE</span>
+            <span class="logo-badge">Cinema</span>
+        </a>
+        <button class="admin-trigger-btn" onclick="openAdminModal()">Ruang Admin</button>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <span class="hero-tag">Akses Premium Cinema</span>
+        <h1>Nikmati Filem & Siri TV <span>Kualiti 4K HDR</span> Tanpa Had</h1>
+        <p>Tonton drama tempatan, siri antarabangsa, dan filem terkini dengan akaun selamat, pantas dan dijamin mesra pengguna.</p>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section">
+        <div class="pricing-grid">
+            <!-- Pakej 1 -->
+            <div class="pricing-card">
+                <div class="card-title" id="p1-title-display">Pakej 1 Bulan</div>
+                <div class="card-price" id="p1-price-display">RM10<span>/bln</span></div>
+                <ul class="features-list" id="p1-benefits-display">
+                    <!-- Dynamic List -->
+                </ul>
+                <a href="#" id="p1-link" target="_blank" class="order-btn">Langgan Sekarang</a>
+            </div>
+
+            <!-- Pakej 2 -->
+            <div class="pricing-card popular">
+                <span class="popular-badge">Pilihan Ramai</span>
+                <div class="card-title" id="p2-title-display">Pakej 2 Bulan</div>
+                <div class="card-price" id="p2-price-display">RM16<span>/2 bln</span></div>
+                <ul class="features-list" id="p2-benefits-display">
+                    <!-- Dynamic List -->
+                </ul>
+                <a href="#" id="p2-link" target="_blank" class="order-btn">Langgan Sekarang</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feedback Section -->
+    <section class="feedback-section">
+        <div class="section-header">
+            <h2>Maklum Balas Pelanggan</h2>
+            <p>Lihat ulasan jujur daripada komuniti pengguna OyenStore Cinema.</p>
+        </div>
+
+        <!-- Form Tambah Ulasan -->
+        <div class="feedback-form-container">
+            <div class="form-group">
+                <label>Nama Anda</label>
+                <input type="text" id="fb-user-name" placeholder="Contoh: Hafiz (Kuala Lumpur)">
+            </div>
+            <div class="form-group">
+                <label>Penilaian</label>
+                <select id="fb-user-stars">
+                    <option value="5">★★★★★ (5 Bintang)</option>
+                    <option value="4">★★★★☆ (4 Bintang)</option>
+                    <option value="3">★★★☆☆ (3 Bintang)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ulasan Anda</label>
+                <textarea id="fb-user-text" rows="3" placeholder="Tulis pengalaman tontonan anda di sini..."></textarea>
+            </div>
+            <button class="submit-fb-btn" onclick="submitLiveFeedback()">Hantar Ulasan Live</button>
+        </div>
+
+        <!-- Senarai Ulasan -->
+        <div class="feedback-grid" id="feedback-grid-container">
+            <!-- Dynamic Feedbacks -->
+        </div>
+    </section>
+
+    <!-- Admin Portal Modal -->
+    <div class="modal-overlay" id="admin-modal-overlay">
+        <div class="admin-modal">
+            <button class="close-btn" onclick="closeAdminModal()">&times;</button>
+            <div class="modal-title" id="admin-header-title">Log Masuk Admin</div>
+
+            <!-- Login Box -->
+            <div class="login-box" id="admin-login-box">
+                <div class="error-msg" id="login-error-msg">Username atau kata laluan salah!</div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="admin-username" placeholder="Masukkan username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="admin-password" placeholder="Masukkan password">
+                </div>
+                <button class="submit-fb-btn" onclick="attemptLogin()">Log Masuk</button>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div class="admin-dashboard" id="admin-dashboard-box">
+                <div class="tab-menu">
+                    <button class="tab-btn active" onclick="switchAdminTab('tab-pricing', this)">Tetapan Pakej</button>
+                    <button class="tab-btn" onclick="switchAdminTab('tab-reviews', this)">Urus Ulasan</button>
+                </div>
+
+                <!-- Tab 1: Tetapan Harga -->
+                <div class="admin-tab-content active" id="tab-pricing">
+                    <div class="form-group">
+                        <label>Nombor WhatsApp (Format 60...)</label>
+                        <input type="text" id="admin-wa-num">
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.08); margin: 20px 0;">
+                    
+                    <div class="form-group">
+                        <label>Tajuk Pakej 1</label>
+                        <input type="text" id="admin-p1-title">
+                    </div>
+                    <div class="form-group">
+                        <label>Harga Pakej 1 (RM)</label>
+                        <input type="text" id="admin-p1-price">
+                    </div>
+                    <div class="form-group">
+                        <label>Manfaat Pakej 1 (Pisahkan dengan koma)</label>
+                        <input type="text" id="admin-p1-benefits">
+                    </div>
+
+                    <hr style="border-color: rgba(255,255,255,0.08); margin: 20px 0;">
+
+                    <div class="form-group">
+                        <label>Tajuk Pakej 2</label>
+                        <input type="text" id="admin-p2-title">
+                    </div>
+                    <div class="form-group">
+                        <label>Harga Pakej 2 (RM)</label>
+                        <input type="text" id="admin-p2-price">
+                    </div>
+                    <div class="form-group">
+                        <label>Manfaat Pakej 2 (Pisahkan dengan koma)</label>
+                        <input type="text" id="admin-p2-benefits">
+                    </div>
+
+                    <button class="submit-fb-btn" onclick="savePricingSettings()">Simpan Tetapan</button>
+                </div>
+
+                <!-- Tab 2: Urus Ulasan -->
+                <div class="admin-tab-content" id="tab-reviews">
+                    <div id="admin-feedback-list-container">
+                        <!-- Dynamic list with delete buttons -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="custom-toast"></div>
+
+    <footer>
+        <p>&copy; 2026 OyenStore Premium Cinema. Hak Cipta Terpelihara.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const DEFAULT_STATE = {
+            waNumber: "60143535612",
+            p1: {
+                title: "Pakej 1 Bulan",
+                price: "10",
+                benefits: [
+                    "1 Skrin Khas (Profil)",
+                    "Resolusi 4K & HDR Aktif",
+                    "Jaminan Akaun Rosak",
+                    "Tiada Limit Screen",
+                    "Sokongan 30 Hari"
+                ]
+            },
+            p2: {
+                title: "Pakej 2 Bulan",
+                price: "16",
+                benefits: [
+                    "1 Skrin Khas (Profil)",
+                    "Resolusi 4K & HDR Aktif",
+                    "Jaminan Akaun Rosak",
+                    "Tiada Limit Screen",
+                    "Sokongan 60 Hari"
+                ]
+            },
+            feedbacks: [
+                {
+                    id: 1,
+                    name: "Ahmad Faiz, KL",
+                    stars: 5,
+                    text: "Akaun siap cepat gila! Gambar mmg tajam 4K HDR layan movie tak pernah sangkut. Terbaik OyenStore!"
+                },
+                {
+                    id: 2,
+                    name: "Nurul Huda, Selangor",
+                    stars: 5,
+                    text: "Servis peramah sangat. Dulu pernah ada masalah tapi min tolong gantikan akaun terus. Sangat dipercayai!"
+                },
+                {
+                    id: 3,
+                    name: "Hafizuddin, Johor",
+                    stars: 5,
+                    text: "Harga paling murah untuk pakej 1 skrin. Boleh pasang kat Smart TV terus. Dah repeat 3 kali!"
+                }
+            ]
+        };
+
+        let appState = {};
+        let isLoggedIn = false;
+
+        function initApp() {
+            const stored = localStorage.getItem('oyenstore_cinema_state_2026');
+            if (stored) {
+                try {
+                    appState = JSON.parse(stored);
+                } catch (e) {
+                    appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                }
+            } else {
+                appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                saveToLocalStorage();
+            }
+            renderUI();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('oyenstore_cinema_state_2026', JSON.stringify(appState));
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('custom-toast');
+            toast.innerText = msg;
+            toast.classList.add('active');
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        function renderUI() {
+            // Render Pakej 1
+            document.getElementById('p1-title-display').innerText = appState.p1.title;
+            document.getElementById('p1-price-display').innerHTML = `RM${appState.p1.price}<span>/1 bln</span>`;
+            document.getElementById('p1-benefits-display').innerHTML = appState.p1.benefits.map(b => `<li>${b}</li>`).join('');
+            const p1Msg = encodeURIComponent(`Hai min Oyen, nak order ${appState.p1.title} (RM${appState.p1.price})`);
+            document.getElementById('p1-link').href = `https://wa.me/${appState.waNumber}?text=${p1Msg}`;
+
+            // Render Pakej 2
+            document.getElementById('p2-title-display').innerText = appState.p2.title;
+            document.getElementById('p2-price-display').innerHTML = `RM${appState.p2.price}<span>/2 bln</span>`;
+            document.getElementById('p2-benefits-display').innerHTML = appState.p2.benefits.map(b => `<li>${b}</li>`).join('');
+            const p2Msg = encodeURIComponent(`Hai min Oyen, nak order ${appState.p2.title} (RM${appState.p2.price})`);
+            document.getElementById('p2-link').href = `https://wa.me/${appState.waNumber}?text=${p2Msg}`;
+
+            // Render Feedback List
+            const fbContainer = document.getElementById('feedback-grid-container');
+            fbContainer.innerHTML = appState.feedbacks.map(fb => {
+                const starStr = '★'.repeat(fb.stars) + '☆'.repeat(5 - fb.stars);
+                return `
+                    <div class="feedback-card">
+                        <div class="stars">${starStr}</div>
+                        <div class="feedback-text">"${fb.text}"</div>
+                        <div class="customer-name">- ${fb.name}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function submitLiveFeedback() {
+            const name = document.getElementById('fb-user-name').value.trim();
+            const stars = parseInt(document.getElementById('fb-user-stars').value, 10);
+            const text = document.getElementById('fb-user-text').value.trim();
+
+            if (!name || !text) {
+                showToast("Sila isi nama dan ulasan anda!");
+                return;
+            }
+
+            const newFb = { id: Date.now(), name, stars, text };
+            appState.feedbacks.unshift(newFb);
+            saveToLocalStorage();
+            renderUI();
+
+            document.getElementById('fb-user-name').value = '';
+            document.getElementById('fb-user-text').value = '';
+            showToast("Terima kasih! Ulasan anda telah disiarkan secara live.");
+        }
+
+        function openAdminModal() {
+            const modal = document.getElementById('admin-modal-overlay');
+            modal.classList.add('active');
+            if (isLoggedIn) {
+                showAdminDashboard();
+            } else {
+                showAdminLogin();
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal-overlay').classList.remove('active');
+        }
+
+        function showAdminLogin() {
+            document.getElementById('admin-header-title').innerText = "Log Masuk Admin";
+            document.getElementById('admin-login-box').style.display = "flex";
+            document.getElementById('admin-dashboard-box').classList.remove('active');
+            document.getElementById('login-error-msg').style.display = "none";
+        }
+
+        function attemptLogin() {
+            const user = document.getElementById('admin-username').value.trim();
+            const pass = document.getElementById('admin-password').value;
+
+            // Password pengesahan: Jebirbot4
+            if (user === 'admin' && pass === 'Jebirbot4') {
+                isLoggedIn = true;
+                showAdminDashboard();
+                showToast("Log masuk berjaya!");
+            } else {
+                document.getElementById('login-error-msg').style.display = "block";
+            }
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('admin-header-title').innerText = "OyenStore Admin Dashboard";
+            document.getElementById('admin-login-box').style.display = "none";
+            document.getElementById('admin-dashboard-box').classList.add('active');
+
+            // Populate form fields
+            document.getElementById('admin-wa-num').value = appState.waNumber;
+            document.getElementById('admin-p1-title').value = appState.p1.title;
+            document.getElementById('admin-p1-price').value = appState.p1.price;
+            document.getElementById('admin-p1-benefits').value = appState.p1.benefits.join(', ');
+
+            document.getElementById('admin-p2-title').value = appState.p2.title;
+            document.getElementById('admin-p2-price').value = appState.p2.price;
+            document.getElementById('admin-p2-benefits').value = appState.p2.benefits.join(', ');
+
+            renderAdminFeedbackList();
+        }
+
+        function switchAdminTab(tabId, btnEl) {
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            btnEl.classList.add('active');
+        }
+
+        function savePricingSettings() {
+            const wa = document.getElementById('admin-wa-num').value.trim();
+            const p1Title = document.getElementById('admin-p1-title').value.trim();
+            const p1Price = document.getElementById('admin-p1-price').value.trim();
+            const p1Benefits = document.getElementById('admin-p1-benefits').split(',').map(b => b.trim()).filter(b => b);
+
+            const p2Title = document.getElementById('admin-p2-title').value.trim();
+            const p2Price = document.getElementById('admin-p2-price').value.trim();
+            const p2Benefits = document.getElementById('admin-p2-benefits').split(',').map(b => b.trim()).filter(b => b);
+
+            if (!wa || !p1Title || !p1Price || !p2Title || !p2Price) {
+                showToast("Sila lengkapkan semua medan!");
+                return;
+            }
+
+            appState.waNumber = wa;
+            appState.p1 = { title: p1Title, price: p1Price, benefits: p1Benefits };
+            appState.p2 = { title: p2Title, price: p2Price, benefits: p2Benefits };
+
+            saveToLocalStorage();
+            renderUI();
+            closeAdminModal();
+            showToast("Tetapan pakej berjaya dikemaskini!");
+        }
+
+        function renderAdminFeedbackList() {
+            const listContainer = document.getElementById('admin-feedback-list-container');
+            if (appState.feedbacks.length === 0) {
+                listContainer.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Tiada ulasan.</p>';
+                return;
+            }
+
+            listContainer.innerHTML = appState.feedbacks.map(fb => `
+                <div class="admin-fb-item">
+                    <div>
+                        <strong>${fb.name} (${fb.stars}★)</strong>
+                        <div style="font-size:12px; color:var(--text-muted);">"${fb.text}"</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteFeedback(${fb.id})">Padam</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteFeedback(id) {
+            appState.feedbacks = appState.feedbacks.filter(f => f.id !== id);
+            saveToLocalStorage();
+            renderUI();
+            renderAdminFeedbackList();
+            showToast("Ulasan telah dipadamkan.");
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
