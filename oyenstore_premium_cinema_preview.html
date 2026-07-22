@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ms" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OyenStore | Pengalaman Pawagam Premium</title>
+    <!-- Fon Premium Montserrat & Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- TETAPAN ASAS --- */
+        :root {
+            --netflix-red: #E50914;
+            --netflix-hover: #b80710;
+            --dark-bg: #000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* --- SKRIN INTRO --- */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.8s ease, visibility 0.8s;
+            padding: 20px;
+        }
+
+        .play-btn-circle {
+            width: 130px;
+            height: 130px;
+            background: #2b0407;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #intro-screen:hover .play-btn-circle {
+            transform: scale(1.08);
+            box-shadow: 0 0 45px rgba(229, 9, 20, 0.5);
+        }
+
+        .play-btn-circle svg {
+            width: 45px;
+            height: 45px;
+            fill: var(--netflix-red);
+            margin-left: 8px;
+        }
+
+        #intro-screen h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        #intro-screen p {
+            font-family: 'Montserrat', sans-serif;
+            color: #666;
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* --- VIDEO FILEM LATAR BELAKANG --- */
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -10;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.05);
+            filter: contrast(1.1) brightness(0.85);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -5;
+            background: linear-gradient(
+                to right, 
+                rgba(0, 0, 0, 0.95) 0%, 
+                rgba(0, 0, 0, 0.5) 40%, 
+                rgba(0, 0, 0, 0.5) 60%, 
+                rgba(0, 0, 0, 0.9) 100%
+            ),
+            linear-gradient(
+                to bottom, 
+                rgba(0, 0, 0, 0.8) 0%, 
+                rgba(0, 0, 0, 0) 20%,
+                rgba(0, 0, 0, 0.95) 100%
+            );
+        }
+
+        /* INDIKATOR SEDANG DITAYANGKAN */
+        .now-playing {
+            position: fixed;
+            top: 85px;
+            right: 50px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        .now-playing.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--netflix-red);
+            border-radius: 50%;
+            animation: blink 1s infinite alternate;
+            box-shadow: 0 0 10px var(--netflix-red);
+        }
+
+        @keyframes blink {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.3; transform: scale(0.9); }
+        }
+
+        .now-playing span {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        /* --- KANDUNGAN UTAMA --- */
+        #main-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- NAVBAR --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 50px;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 950;
+            color: var(--netflix-red);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .admin-trigger-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .admin-trigger-btn:hover {
+            background: var(--netflix-red);
+            border-color: var(--netflix-red);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 40px 50px 60px;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 0.92;
+            letter-spacing: -2.5px;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 15px rgba(0,0,0,0.9);
+            text-align: left;
+        }
+
+        .hero h1 span {
+            color: var(--netflix-red);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+            text-align: left;
+        }
+
+        /* --- SEKSYEN HARGA --- */
+        .pricing {
+            padding: 20px 50px 80px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            flex: 1;
+            max-width: 380px;
+            min-width: 300px;
+            background: rgba(20, 20, 20, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 40px 30px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(30, 30, 30, 0.6);
+            border-color: rgba(229, 9, 20, 0.5);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .card.popular {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 0.15), rgba(0, 0, 0, 0.7));
+            border-color: var(--netflix-red);
+            transform: scale(1.02);
+        }
+
+        .card.popular:hover {
+            transform: scale(1.02) translateY(-10px);
+        }
+
+        .badge-popular {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background-color: var(--netflix-red);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(229, 9, 20, 0.4);
+        }
+
+        .card h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .price {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 44px;
+            font-weight: 900;
+            margin-bottom: 25px;
+        }
+
+        .price span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #aaa;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .features li {
+            margin-bottom: 14px;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .features li::before {
+            content: '►';
+            color: var(--netflix-red);
+            font-size: 12px;
+            margin-right: 12px;
+        }
+
+        .btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: #fff;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card.popular .btn {
+            background: var(--netflix-red);
+            border-color: var(--netflix-red);
+        }
+
+        .btn:hover {
+            background: var(--netflix-red);
+            border-color: var(--netflix-red);
+            box-shadow: 0 0 15px rgba(229,9,20,0.4);
+        }
+
+        /* --- SEKSYEN FEEDBACK / TESTIMONI --- */
+        .feedback-section {
+            padding: 60px 50px 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .feedback-form {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .feedback-form h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--netflix-red);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #ccc;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--netflix-red);
+        }
+
+        .btn-submit-feedback {
+            background-color: var(--netflix-red);
+            color: #fff;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.3s;
+        }
+
+        .btn-submit-feedback:hover {
+            background-color: var(--netflix-hover);
+        }
+
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .feedback-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            position: relative;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .feedback-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(229, 9, 20, 0.3);
+        }
+
+        .stars {
+            color: #FFD700;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .feedback-text {
+            font-size: 15px;
+            color: #d1d1d1;
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            min-height: 70px;
+        }
+
+        .customer-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--netflix-red);
+        }
+
+        /* --- PORTAL ADMIN MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .admin-modal {
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 650px;
+            border-radius: 16px;
+            padding: 35px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal-btn:hover {
+            color: #fff;
+        }
+
+        .admin-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--netflix-red);
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 15px;
+        }
+
+        .login-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .login-error {
+            color: var(--netflix-red);
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(229, 9, 20, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(229, 9, 20, 0.2);
+            display: none;
+        }
+
+        .admin-dashboard {
+            display: none;
+        }
+
+        .admin-dashboard.active {
+            display: block;
+        }
+
+        .dashboard-tab {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .tab-btn.active {
+            background: var(--netflix-red);
+            border-color: var(--netflix-red);
+            color: #fff;
+        }
+
+        .admin-section-content {
+            display: none;
+        }
+
+        .admin-section-content.active {
+            display: block;
+        }
+
+        .admin-feedback-item {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-feedback-info {
+            max-width: 80%;
+            text-align: left;
+        }
+
+        .admin-feedback-info strong {
+            color: var(--netflix-red);
+            font-size: 14px;
+        }
+
+        .admin-feedback-info p {
+            font-size: 13px;
+            color: #ccc;
+            margin-top: 4px;
+        }
+
+        .delete-fb-btn {
+            background: #E50914;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .delete-fb-btn:hover {
+            background: #b80710;
+        }
+
+        .custom-popup-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #111;
+            border-left: 5px solid var(--netflix-red);
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 6px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 10001;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+
+        .custom-popup-notification.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 20px;
+                position: relative;
+                z-index: 101;
+            }
+            .hero {
+                padding: 130px 20px 40px;
+                text-align: left;
+            }
+            .hero h1 { 
+                font-size: 3.8rem;
+                line-height: 0.95;
+                letter-spacing: -2px;
+            }
+            .pricing {
+                padding: 10px 20px;
+                gap: 25px;
+            }
+            .feedback-section {
+                padding: 40px 20px;
+            }
+            .card.popular { 
+                transform: scale(1); 
+            }
+            .card.popular:hover { 
+                transform: translateY(-10px); 
+            }
+            .now-playing {
+                top: 85px;
+                right: 20px;
+                padding: 6px 12px;
+            }
+            .now-playing span {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NOTIFIKASI POPUP -->
+    <div id="custom-popup" class="custom-popup-notification"></div>
+
+    <!-- SKRIN INTRO -->
+    <div id="intro-screen" onclick="startExperience()">
+        <div class="play-btn-circle">
+            <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+        </div>
+        <h2>MASUK KE PAWAGAM</h2>
+        <p>Klik di mana-mana skrin untuk mulakan</p>
+    </div>
+
+    <!-- VIDEO TEASER GERAK LATAR BELAKANG -->
+    <div class="video-container">
+        <video id="bg-video" loop muted playsinline crossorigin="anonymous" poster="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1920">
+            <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="overlay"></div>
+
+    <!-- INDIKATOR SEDANG DITAYANGKAN -->
+    <div class="now-playing" id="live-indicator">
+        <div class="dot"></div>
+        <span>Sedang Ditayangkan</span>
+    </div>
+
+    <!-- UTAMA -->
+    <div id="main-content">
+        <header>
+            <div class="logo">OyenStore</div>
+            <button class="admin-trigger-btn" onclick="openAdminModal()">Ruang Admin</button>
+        </header>
+
+        <section class="hero">
+            <h1>Kualiti<br>Pawagam<br>Dalam<br><span>Tangan<br>Anda.</span></h1>
+            <p>Akaun Premium rasmi dengan resolusi 4K Ultra HD. Tonton siri, filem aksi, kartun dan rancangan kegemaran anda tanpa iklan, tanpa penimbalan (buffering), dan pada harga borong.</p>
+        </section>
+
+        <!-- SEKSYEN HARGA -->
+        <section class="pricing">
+            <div class="card" id="card-p1">
+                <h3 id="p1-title-display">Pakej 1 Bulan</h3>
+                <div class="price" id="p1-price-display">RM10<span>/1 bln</span></div>
+                <ul class="features" id="p1-benefits-display">
+                    <li>1 Skrin Khas (Profil)</li>
+                    <li>Resolusi 4K & HDR Aktif</li>
+                    <li>Jaminan Akaun Rosak</li>
+                    <li>Tiada Limit Screen</li>
+                    <li>Sokongan 30 Hari</li>
+                </ul>
+                <a href="#" id="p1-link" class="btn" target="_blank">Pilih Pakej</a>
+            </div>
+
+            <div class="card popular" id="card-p2">
+                <div class="badge-popular">Best Seller</div>
+                <h3 id="p2-title-display">Pakej 2 Bulan</h3>
+                <div class="price" id="p2-price-display">RM16<span>/2 bln</span></div>
+                <ul class="features" id="p2-benefits-display">
+                    <li>1 Skrin Khas (Profil)</li>
+                    <li>Resolusi 4K & HDR Aktif</li>
+                    <li>Jaminan Akaun Rosak</li>
+                    <li>Tiada Limit Screen</li>
+                    <li>Sokongan 60 Hari</li>
+                </ul>
+                <a href="#" id="p2-link" class="btn" target="_blank">Langgan Sekarang</a>
+            </div>
+        </section>
+
+        <!-- SEKSYEN FEEDBACK -->
+        <section class="feedback-section">
+            <h2 class="section-title">Apa Kata Pelanggan Kami?</h2>
+            <p class="section-subtitle">Sertai ribuan pelanggan OyenStore yang gembira menikmati tontonan premium hari ini!</p>
+            
+            <div class="feedback-form">
+                <h4>Kongsi Pengalaman Anda</h4>
+                <div class="form-group">
+                    <label>Nama Anda</label>
+                    <input type="text" id="fb-user-name" placeholder="Contoh: Daniel Johor">
+                </div>
+                <div class="form-group">
+                    <label>Penarafan (Rating)</label>
+                    <select id="fb-user-stars" style="color: #FFD700; font-weight: bold; background: #222;">
+                        <option value="5">★★★★★ (5 Bintang)</option>
+                        <option value="4">★★★★☆ (4 Bintang)</option>
+                        <option value="3">★★★☆☆ (3 Bintang)</option>
+                        <option value="2">★★☆☆☆ (2 Bintang)</option>
+                        <option value="1">★☆☆☆☆ (1 Bintang)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ulasan / Maklum Balas</label>
+                    <textarea id="fb-user-text" rows="3" placeholder="Tulis maklum balas ikhlas anda tentang servis OyenStore..."></textarea>
+                </div>
+                <button class="btn-submit-feedback" onclick="submitLiveFeedback()">Hantar Maklum Balas</button>
+            </div>
+
+            <div class="feedback-grid" id="feedback-grid-container"></div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer style="text-align: center; padding: 40px 20px; background: rgba(0,0,0,0.9); border-top: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: #555;">
+            <p>&copy; 2026 OyenStore Premium. Kami adalah penyedia perkhidmatan bebas pihak ketiga.</p>
+        </footer>
+    </div>
+
+    <!-- PORTAL ADMIN MODAL -->
+    <div class="modal-overlay" id="admin-modal-overlay">
+        <div class="admin-modal">
+            <button class="close-modal-btn" onclick="closeAdminModal()">&times;</button>
+            <div class="admin-title" id="admin-header-title">Log Masuk Admin OyenStore</div>
+            
+            <div id="admin-login-box" class="login-box">
+                <div class="login-error" id="login-error-msg">Username atau Password salah!</div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="admin-username" placeholder="Masukkan username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="admin-password" placeholder="Masukkan password">
+                </div>
+                <button class="btn-submit-feedback" onclick="attemptLogin()">Log Masuk</button>
+            </div>
+
+            <div id="admin-dashboard-box" class="admin-dashboard">
+                <div class="dashboard-tab">
+                    <button class="tab-btn active" onclick="switchTab('pricing-settings', this)">Urus Pakej & Harga</button>
+                    <button class="tab-btn" onclick="switchTab('feedback-settings', this)">Urus Maklum Balas</button>
+                </div>
+
+                <div id="pricing-settings" class="admin-section-content active">
+                    <div style="margin-bottom: 20px; font-size: 14px; color: #aaa; text-align: left;">Sila kemaskini maklumat kedai anda di bawah:</div>
+                    
+                    <div class="form-group" style="text-align: left;">
+                        <label>Nombor WhatsApp Kedai (Tanpa '+', mulakan dengan 60)</label>
+                        <input type="text" id="admin-wa-num" value="60143535612">
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 15px; text-align: left;">
+                        <h4 style="color: var(--netflix-red); font-size: 15px; margin-bottom: 15px;">KANDUNGAN PAKEJ 1 BULAN</h4>
+                        <div class="form-group">
+                            <label>Nama Pakej</label>
+                            <input type="text" id="admin-p1-title" value="Pakej 1 Bulan">
+                        </div>
+                        <div class="form-group">
+                            <label>Harga (RM)</label>
+                            <input type="text" id="admin-p1-price" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Senarai Manfaat (Pisahkan setiap satu dengan koma ',')</label>
+                            <textarea id="admin-p1-benefits" rows="3">1 Skrin Khas (Profil), Resolusi 4K & HDR Aktif, Jaminan Akaun Rosak, Tiada Limit Screen, Sokongan 30 Hari</textarea>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; padding-top: 15px; text-align: left;">
+                        <h4 style="color: var(--netflix-red); font-size: 15px; margin-bottom: 15px;">KANDUNGAN PAKEJ 2 BULAN</h4>
+                        <div class="form-group">
+                            <label>Nama Pakej</label>
+                            <input type="text" id="admin-p2-title" value="Pakej 2 Bulan">
+                        </div>
+                        <div class="form-group">
+                            <label>Harga (RM)</label>
+                            <input type="text" id="admin-p2-price" value="16">
+                        </div>
+                        <div class="form-group">
+                            <label>Senarai Manfaat (Pisahkan setiap satu dengan koma ',')</label>
+                            <textarea id="admin-p2-benefits" rows="3">1 Skrin Khas (Profil), Resolusi 4K & HDR Aktif, Jaminan Akaun Rosak, Tiada Limit Screen, Sokongan 60 Hari</textarea>
+                        </div>
+                    </div>
+
+                    <button class="btn-submit-feedback" style="margin-top: 20px;" onclick="savePricingSettings()">Simpan Perubahan</button>
+                </div>
+
+                <div id="feedback-settings" class="admin-section-content">
+                    <div style="margin-bottom: 20px; font-size: 14px; color: #aaa; text-align: left;">Uruskan maklum balas yang dipaparkan secara live di bawah:</div>
+                    <div id="admin-feedback-list-container" style="max-height: 350px; overflow-y: auto; padding-right: 5px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        const DEFAULT_STATE = {
+            waNumber: "60143535612",
+            p1: {
+                title: "Pakej 1 Bulan",
+                price: "10",
+                benefits: [
+                    "1 Skrin Khas (Profil)",
+                    "Resolusi 4K & HDR Aktif",
+                    "Jaminan Akaun Rosak",
+                    "Tiada Limit Screen",
+                    "Sokongan 30 Hari"
+                ]
+            },
+            p2: {
+                title: "Pakej 2 Bulan",
+                price: "16",
+                benefits: [
+                    "1 Skrin Khas (Profil)",
+                    "Resolusi 4K & HDR Aktif",
+                    "Jaminan Akaun Rosak",
+                    "Tiada Limit Screen",
+                    "Sokongan 60 Hari"
+                ]
+            },
+            feedbacks: [
+                {
+                    id: 1,
+                    name: "Ahmad Faiz, Kuala Lumpur",
+                    stars: 5,
+                    text: "Terbaik OyenStore! Baru lepas langgan pakej 2 bulan. Akaun masuk cepat gila tak sampai 5 minit. Gambar memang sharp 4K HDR layan movie tak sangkut."
+                },
+                {
+                    id: 2,
+                    name: "Nurul Huda, Selangor",
+                    stars: 5,
+                    text: "Servis tiptop admin peramah. Hari tu ada masalah screen limit tapi admin terus setelkan bagi profil baru on the spot. Highly recommended trusted seller!"
+                },
+                {
+                    id: 3,
+                    name: "Hafizuddin, Johor",
+                    stars: 5,
+                    text: "Paling murah setakat ni aku jumpa untuk pakej 1 skrin. Boleh pasang kat Smart TV gambar memang mantap. Dah repeat order kali ke-3 dengan OyenStore."
+                }
+            ]
+        };
+
+        let appState = {};
+
+        function initApp() {
+            const stored = localStorage.getItem('oyenstore_premium_state_2026');
+            if (stored) {
+                appState = JSON.parse(stored);
+            } else {
+                appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                saveToLocalStorage();
+            }
+            renderUI();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('oyenstore_premium_state_2026', JSON.stringify(appState));
+        }
+
+        function showPopup(message) {
+            const popup = document.getElementById('custom-popup');
+            popup.innerText = message;
+            popup.classList.add('active');
+            setTimeout(() => {
+                popup.classList.remove('active');
+            }, 3000);
+        }
+
+        function renderUI() {
+            document.getElementById('p1-title-display').innerText = appState.p1.title;
+            document.getElementById('p1-price-display').innerHTML = `RM${appState.p1.price}<span>/1 bln</span>`;
+            
+            let p1BenefitsHtml = '';
+            appState.p1.benefits.forEach(b => {
+                p1BenefitsHtml += `<li>${b.trim()}</li>`;
+            });
+            document.getElementById('p1-benefits-display').innerHTML = p1BenefitsHtml;
+
+            const p1Msg = encodeURIComponent(`Hai min oyen nak Oder pakej Netflix Premium ${appState.p1.title}`);
+            document.getElementById('p1-link').href = `https://wa.me/${appState.waNumber}?text=${p1Msg}`;
+
+            document.getElementById('p2-title-display').innerText = appState.p2.title;
+            document.getElementById('p2-price-display').innerHTML = `RM${appState.p2.price}<span>/2 bln</span>`;
+            
+            let p2BenefitsHtml = '';
+            appState.p2.benefits.forEach(b => {
+                p2BenefitsHtml += `<li>${b.trim()}</li>`;
+            });
+            document.getElementById('p2-benefits-display').innerHTML = p2BenefitsHtml;
+
+            const p2Msg = encodeURIComponent(`Hai min oyen nak Oder pakej Netflix Premium ${appState.p2.title}`);
+            document.getElementById('p2-link').href = `https://wa.me/${appState.waNumber}?text=${p2Msg}`;
+
+            const feedbackGrid = document.getElementById('feedback-grid-container');
+            let feedbackHtml = '';
+            
+            appState.feedbacks.forEach(fb => {
+                let starDisplay = '★'.repeat(fb.stars) + '☆'.repeat(5 - fb.stars);
+                feedbackHtml += `
+                    <div class="feedback-card" id="fb-card-${fb.id}">
+                        <div class="stars">${starDisplay}</div>
+                        <p class="feedback-text">"${fb.text}"</p>
+                        <p class="customer-name">- ${fb.name}</p>
+                    </div>
+                `;
+            });
+            feedbackGrid.innerHTML = feedbackHtml;
+        }
+
+        function startExperience() {
+            const video = document.getElementById('bg-video');
+            const introScreen = document.getElementById('intro-screen');
+            const mainContent = document.getElementById('main-content');
+            const liveIndicator = document.getElementById('live-indicator');
+
+            video.play().then(() => {
+                console.log("Video berjalan.");
+            }).catch((error) => {
+                console.error("Autoplay dihalang:", error);
+                video.load();
+                video.play();
+            });
+
+            introScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                introScreen.style.visibility = 'hidden';
+                introScreen.style.display = 'none';
+                
+                mainContent.classList.add('visible');
+                liveIndicator.classList.add('visible');
+            }, 800);
+        }
+
+        function submitLiveFeedback() {
+            const nameInput = document.getElementById('fb-user-name');
+            const starsSelect = document.getElementById('fb-user-stars');
+            const textInput = document.getElementById('fb-user-text');
+
+            const name = nameInput.value.trim();
+            const stars = parseInt(starsSelect.value);
+            const text = textInput.value.trim();
+
+            if (!name || !text) {
+                showPopup("Sila isi nama dan ulasan!");
+                return;
+            }
+
+            const newFeedback = {
+                id: Date.now(),
+                name: name,
+                stars: stars,
+                text: text
+            };
+
+            appState.feedbacks.unshift(newFeedback);
+            saveToLocalStorage();
+            renderUI();
+
+            nameInput.value = '';
+            textInput.value = '';
+            starsSelect.value = '5';
+
+            showPopup("Terima kasih! Maklum balas telah dipaparkan secara live.");
+        }
+
+        /* --- LOGIK PORTAL ADMIN --- */
+        let isLoggedIn = false;
+
+        function openAdminModal() {
+            const modal = document.getElementById('admin-modal-overlay');
+            modal.classList.add('active');
+
+            if (isLoggedIn) {
+                showAdminDashboard();
+            } else {
+                showAdminLogin();
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal-overlay').classList.remove('active');
+        }
+
+        function showAdminLogin() {
+            document.getElementById('admin-header-title').innerText = "Log Masuk Admin OyenStore";
+            document.getElementById('admin-login-box').style.display = "flex";
+            document.getElementById('admin-dashboard-box').classList.remove('active');
+            document.getElementById('login-error-msg').style.display = "none";
+            document.getElementById('admin-password').value = '';
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('admin-header-title').innerText = "OyenStore Admin Dashboard";
+            document.getElementById('admin-login-box').style.display = "none";
+            document.getElementById('admin-dashboard-box').classList.add('active');
+            
+            document.getElementById('admin-wa-num').value = appState.waNumber;
+            document.getElementById('admin-p1-title').value = appState.p1.title;
+            document.getElementById('admin-p1-price').value = appState.p1.price;
+            document.getElementById('admin-p1-benefits').value = appState.p1.benefits.join(', ');
+
+            document.getElementById('admin-p2-title').value = appState.p2.title;
+            document.getElementById('admin-p2-price').value = appState.p2.price;
+            document.getElementById('admin-p2-benefits').value = appState.p2.benefits.join(', ');
+
+            renderAdminFeedbackList();
+        }
+
+        function attemptLogin() {
+            const user = document.getElementById('admin-username').value.trim();
+            const pass = document.getElementById('admin-password').value;
+
+            // KATA LALUAN: Jebirbot4
+            if (user === 'admin' && pass === 'Jebirbot4') {
+                isLoggedIn = true;
+                showAdminDashboard();
+                showPopup("Log masuk berjaya!");
+            } else {
+                document.getElementById('login-error-msg').style.display = "block";
+            }
+        }
+
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.admin-section-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        function savePricingSettings() {
+            const wa = document.getElementById('admin-wa-num').value.trim();
+            const p1Title = document.getElementById('admin-p1-title').value.trim();
+            const p1Price = document.getElementById('admin-p1-price').value.trim();
+            const p1Benefits = document.getElementById('admin-p1-benefits').value.split(',');
+
+            const p2Title = document.getElementById('admin-p2-title').value.trim();
+            const p2Price = document.getElementById('admin-p2-price').value.trim();
+            const p2Benefits = document.getElementById('admin-p2-benefits').value.split(',');
+
+            if (!wa || !p1Title || !p1Price || !p2Title || !p2Price) {
+                showPopup("Sila isi semua maklumat!");
+                return;
+            }
+
+            appState.waNumber = wa;
+            appState.p1.title = p1Title;
+            appState.p1.price = p1Price;
+            appState.p1.benefits = p1Benefits.map(b => b.trim()).filter(b => b.length > 0);
+
+            appState.p2.title = p2Title;
+            appState.p2.price = p2Price;
+            appState.p2.benefits = p2Benefits.map(b => b.trim()).filter(b => b.length > 0);
+
+            saveToLocalStorage();
+            renderUI();
+            closeAdminModal();
+            showPopup("Pakej berjaya dikemaskini!");
+        }
+
+        function renderAdminFeedbackList() {
+            const listContainer = document.getElementById('admin-feedback-list-container');
+            let listHtml = '';
+
+            if (appState.feedbacks.length === 0) {
+                listHtml = '<div style="text-align: center; color: #888; padding: 20px;">Tiada maklum balas.</div>';
+            } else {
+                appState.feedbacks.forEach(fb => {
+                    listHtml += `
+                        <div class="admin-feedback-item" id="admin-fb-item-${fb.id}">
+                            <div class="admin-feedback-info">
+                                <strong>${fb.name} (${fb.stars} Bintang)</strong>
+                                <p>"${fb.text}"</p>
+                            </div>
+                            <button class="delete-fb-btn" onclick="deleteFeedback(${fb.id})">Hapus</button>
+                        </div>
+                    `;
+                });
+            }
+
+            listContainer.innerHTML = listHtml;
+        }
+
+        function deleteFeedback(id) {
+            appState.feedbacks = appState.feedbacks.filter(fb => fb.id !== id);
+            saveToLocalStorage();
+            renderUI();
+            renderAdminFeedbackList();
+            showPopup("Maklum balas berjaya dipadam!");
+        }
+
+        // Parallax Effect
+        const mainScroll = document.getElementById('main-content');
+        const videoElement = document.getElementById('bg-video');
+        
+        mainScroll.addEventListener('scroll', () => {
+            const scrollVal = mainScroll.scrollTop;
+            videoElement.style.transform = `scale(1.05) translateY(${scrollVal * 0.4}px)`;
+        });
+
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
